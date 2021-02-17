@@ -1,4 +1,12 @@
-from keras.preprocessing.image import ImageDataGenerator,img_to_array, load_img
+import keras
+import cv2
+import os
+import glob
+from keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
+
+
+Input_folder = "/content/drive/My Drive/protomask/observations/experiements/data/without_mask" # Enter Directory of all images
+Output_folder = "/content/drive/My Drive/protomask/training/augmentation/without_mask"
 
 #Data augmentation parameters
 datagen = ImageDataGenerator(
@@ -10,12 +18,18 @@ datagen = ImageDataGenerator(
         horizontal_flip=True,
         fill_mode='nearest')
 
-img = load_img('data/test/2.jpg')  #taking input image
-x = img_to_array(img)  # creating a Numpy array with shape (3, 150, 150)
-x = x.reshape((1,) + x.shape)  # converting to a Numpy array with shape (1, 3, 150, 150)
 
-i = 0 #creating the required images using a loop
-for batch in datagen.flow(x,save_to_dir='preview', save_prefix='dog', save_format='jpeg'):
-    i += 1
-    if i > 36:
-        break 
+data_path = os.path.join(Input_folder,'*g')
+files = glob.glob(data_path)
+data = []
+for f1 in files:
+    img = cv2.imread(f1)
+    data.append(img)
+    x = img_to_array(img)
+    x = x.reshape((1,) + x.shape)
+    
+    i = 0
+    for batch in datagen.flow (x, batch_size=1, save_to_dir =Output_folder,save_prefix="aug",save_format='jpg'):
+      i+= 1
+      if i > 36:
+        break
